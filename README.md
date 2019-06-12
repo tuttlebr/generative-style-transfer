@@ -34,6 +34,9 @@ nvidia-docker run -it -d \
 
 ## Run an example within container
 ```bash
-docker exec -it {container_id} python3 StyleTransfer.py -c cat_content.jpg -s the_fall_of_phaeton.jpg --epoch 3
+docker exec -it {container_id} python3 StyleTransfer.py \
+  -c cat_content.jpg \
+  -s the_fall_of_phaeton.jpg \
+  --epoch 3
 ```
 
