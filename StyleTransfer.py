@@ -205,7 +205,7 @@ def st_model(content_path=args.content_path,
         for m in range(steps_per_epoch):
             step += 1
             train_step(image)
-            print(f"{m/(steps_per_epoch+1)*100:.1f} %", end="\r")
+            print(f"{m/(steps_per_epoch)*100:.1f} %", end="\r")
 
 
     saver(image[0])
