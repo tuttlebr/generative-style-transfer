@@ -3,8 +3,9 @@ Generative-style-transfer with tensorflow 2
 
 A simple implementation of neural style transfer in python using Tensorflow 2.0.
 
-<img src="https://github.com/tuttlebr/generative-style-transfer/blob/master/cat_content.jpg" width="100">
-<img src="https://github.com/tuttlebr/generative-style-transfer/blob/master/the_fall_of_phaeton.jpg" width="100">
+<img src="https://github.com/tuttlebr/generative-style-transfer/blob/master/cat_content.jpg" width="200">
+<img src="https://github.com/tuttlebr/generative-style-transfer/blob/master/the_fall_of_phaeton.jpg" width="200">
+<img src="https://github.com/tuttlebr/generative-style-transfer/blob/master/1560302117.png" width="200">
 
 ## Requirements
 [Docker-ce](https://docs.docker.com/v17.12/install/ "Docker Installation Info")
