@@ -45,8 +45,9 @@ ENV LD_LIBRARY_PATH $LD_LIBRARY_PATH:/usr/local/cuda/extras/CUPTI/lib64:/usr/loc
 # Allow Python printing utf-8
 ENV PYTHONIOENCODING UTF-8
 
+EXPOSE 5000
 
-RUN pip3 install tensorflow-gpu==2.0.0-alpha0 pillow jupyter matplotlib
+RUN pip3 install tensorflow-gpu==2.0.0-alpha0 pillow jupyter matplotlib flask flask_restplus
 
 
 RUN jupyter notebook --generate-config && \
