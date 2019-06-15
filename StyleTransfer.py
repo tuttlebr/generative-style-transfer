@@ -1,4 +1,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
+from absl import logging
+logging.set_verbosity(logging.ERROR)
+
 import argparse
 
 import tensorflow as tf
@@ -6,14 +9,15 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 import numpy as np
 import os
+import progressbar
 
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-c", "--content_path", help="String filename for your original jpeg.", required=True)
-parser.add_argument("-s", "--style_path", help="String filename for your style jpeg.", required=True)
+parser.add_argument("-c", "--content_path", help="String filename for your original jpeg.", required=False)
+parser.add_argument("-s", "--style_path", help="String filename for your style jpeg.", required=False)
 parser.add_argument("--epochs", type=int, default=1, required=False, help="Epochs to learn style.")
-parser.add_argument("--steps_per_epoch", type=int, default=100, required=False, help="Steps-per-epoch to learn style.")
+parser.add_argument("--steps_per_epoch", type=int, default=200, required=False, help="Steps-per-epoch to learn style.")
 parser.add_argument("--style_weight", type=float, default=1e-2, required=False, help="Bias of the style")
 parser.add_argument("--content_weight", type=float, default=1e4, required=False, help="Bias of the original")
 parser.add_argument("--total_variation_weight", type=float, default=1e8, required=False, help="Global difference")
@@ -179,12 +183,18 @@ def st_model(content_path=args.content_path,
     image = tf.Variable(content_image)
 
     step = 0
+    bar = progressbar.ProgressBar(maxval=(epochs*steps_per_epoch), \
+    widgets=["Style Transfer Progress:", progressbar.Bar('=', '[', ']'), ' ', 
+             progressbar.Percentage(), ' ', 
+             progressbar.AdaptiveETA()])
+    
+    bar.start()
     for n in range(epochs):
-        print("Running epoch {} of {}".format(n+1, epochs), end="\n")
         for m in range(steps_per_epoch):
             step += 1
             train_step(image)
-            print(f"{m/(steps_per_epoch)*100:.1f} %", end="\r")
+            bar.update((step-1)+1)
+    bar.finish()
 
     saver(image[0])
     

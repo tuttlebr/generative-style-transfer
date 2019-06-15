@@ -47,7 +47,7 @@ ENV PYTHONIOENCODING UTF-8
 
 EXPOSE 5000
 
-RUN pip3 install tensorflow-gpu==2.0.0-alpha0 pillow jupyter matplotlib flask flask_restplus
+RUN pip3 install tensorflow-gpu==2.0.0-alpha0 pillow jupyter matplotlib flask flask_restplus progressbar absl
 
 
 RUN jupyter notebook --generate-config && \
