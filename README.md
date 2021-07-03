@@ -14,7 +14,7 @@ Base Image | Style Image | Final Image
 ```
 
 ## Customize
-Modifications may be made to the style and content images, as well as hyperparameters, from the .env file. 
+Modifications may be made to the style and content images, as well as hyperparameters, from the .env file.
 
 ```bash
 CONTENT_PATH=sample_images/daphnee_cat.jpg

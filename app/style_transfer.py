@@ -1,9 +1,10 @@
 import argparse
-from logging import info
 import os
-from tqdm import tqdm
+from logging import info
+
 import tensorflow as tf
 from matplotlib.pyplot import imsave
+from tqdm import tqdm
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
@@ -134,7 +135,9 @@ def st_model(
         def call(self, inputs):
             "Expects float input in [0,1]"
             inputs = inputs * 255.0
-            preprocessed_input = tf.keras.applications.vgg19.preprocess_input(inputs)
+            preprocessed_input = tf.keras.applications.vgg19.preprocess_input(
+                inputs
+            )
             outputs = self.vgg(preprocessed_input)
             style_outputs, content_outputs = (
                 outputs[: self.num_style_layers],
@@ -147,7 +150,9 @@ def st_model(
 
             content_dict = {
                 content_name: value
-                for content_name, value in zip(self.content_layers, content_outputs)
+                for content_name, value in zip(
+                    self.content_layers, content_outputs
+                )
             }
 
             style_dict = {
@@ -173,7 +178,9 @@ def st_model(
 
         content_loss = tf.add_n(
             [
-                tf.reduce_mean((content_outputs[name] - content_targets[name]) ** 2)
+                tf.reduce_mean(
+                    (content_outputs[name] - content_targets[name]) ** 2
+                )
                 for name in content_outputs.keys()
             ]
         )
@@ -226,14 +233,14 @@ def st_model(
     opt = tf.optimizers.Adam(learning_rate=0.02, beta_1=0.99, epsilon=1e-1)
     image = tf.Variable(content_image)
 
-    steps_epochs = (epochs * steps_per_epoch)
+    steps_epochs = epochs * steps_per_epoch
 
     for m in tqdm(
         range(0, steps_epochs),
         desc="Progress: ",
         total=steps_epochs,
-        ncols = 100,
-        ):
+        ncols=100,
+    ):
         train_step(image)
 
     saver(image[0])
