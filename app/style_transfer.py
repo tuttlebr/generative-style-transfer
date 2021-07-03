@@ -93,7 +93,7 @@ def st_model(
 
     def saver(tensorarray):
         save_as = tensorarray.numpy()
-        file_name = "results/" + str(int(tf.timestamp().numpy())) + ".png"
+        file_name = "results/" + str(int(tf.timestamp().numpy())) + ".jpg"
         imsave(file_name, save_as)
         info("Saved style transfer image to: {}".format(file_name))
 
