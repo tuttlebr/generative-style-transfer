@@ -1,17 +1,9 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-from absl import logging
-
-logging.set_verbosity(logging.ERROR)
-
 import argparse
-
-import tensorflow as tf
-import matplotlib.pyplot as plt
-import matplotlib as mpl
-import numpy as np
 import os
-import progressbar
 
+import matplotlib as mpl
+import progressbar
+import tensorflow as tf
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
@@ -21,10 +13,17 @@ parser.add_argument(
     required=False,
 )
 parser.add_argument(
-    "-s", "--style_path", help="String filename for your style jpeg.", required=False
+    "-s",
+    "--style_path",
+    help="String filename for your style jpeg.",
+    required=False,
 )
 parser.add_argument(
-    "--epochs", type=int, default=1, required=False, help="Epochs to learn style."
+    "--epochs",
+    type=int,
+    default=1,
+    required=False,
+    help="Epochs to learn style.",
 )
 parser.add_argument(
     "--steps_per_epoch",
@@ -34,7 +33,11 @@ parser.add_argument(
     help="Steps-per-epoch to learn style.",
 )
 parser.add_argument(
-    "--style_weight", type=float, default=1e-2, required=False, help="Bias of the style"
+    "--style_weight",
+    type=float,
+    default=1e-2,
+    required=False,
+    help="Bias of the style",
 )
 parser.add_argument(
     "--content_weight",
@@ -51,7 +54,11 @@ parser.add_argument(
     help="Global difference",
 )
 parser.add_argument(
-    "--max_dim", type=int, default=512, required=False, help="Longest dimension"
+    "--max_dim",
+    type=int,
+    default=512,
+    required=False,
+    help="Longest dimension",
 )
 
 args = parser.parse_args()
@@ -91,7 +98,8 @@ def st_model(
         print("\nSaved style transfer image to: {}".format(file_name))
 
     def vgg_layers(layer_names):
-        """Creates a vgg model that returns a list of intermediate output values."""
+        """Creates a vgg model that returns a list of intermediate output
+        values."""
         vgg = tf.keras.applications.VGG19(include_top=False, weights="imagenet")
         vgg.trainable = False
 
@@ -101,9 +109,11 @@ def st_model(
         return model
 
     def gram_matrix(input_tensor):
-        """the style of an image can be described by the means and correlations across the different feature maps.
-        Calculate a Gram matrix that includes this information by taking the outer product of the feature vector
-        with itself at each location, and averaging that outer product over all locations."""
+        """the style of an image can be described by the means and correlations
+        across the different feature maps. Calculate a Gram matrix that
+        includes this information by taking the outer product of the feature
+        vector with itself at each location, and averaging that outer product
+        over all locations."""
 
         result = tf.linalg.einsum("bijc,bijd->bcd", input_tensor, input_tensor)
         input_shape = tf.shape(input_tensor)
@@ -122,7 +132,9 @@ def st_model(
         def call(self, inputs):
             "Expects float input in [0,1]"
             inputs = inputs * 255.0
-            preprocessed_input = tf.keras.applications.vgg19.preprocess_input(inputs)
+            preprocessed_input = tf.keras.applications.vgg19.preprocess_input(
+                inputs
+            )
             outputs = self.vgg(preprocessed_input)
             style_outputs, content_outputs = (
                 outputs[: self.num_style_layers],
@@ -135,7 +147,9 @@ def st_model(
 
             content_dict = {
                 content_name: value
-                for content_name, value in zip(self.content_layers, content_outputs)
+                for content_name, value in zip(
+                    self.content_layers, content_outputs
+                )
             }
 
             style_dict = {
@@ -161,7 +175,9 @@ def st_model(
 
         content_loss = tf.add_n(
             [
-                tf.reduce_mean((content_outputs[name] - content_targets[name]) ** 2)
+                tf.reduce_mean(
+                    (content_outputs[name] - content_targets[name]) ** 2
+                )
                 for name in content_outputs.keys()
             ]
         )
@@ -208,10 +224,8 @@ def st_model(
     num_content_layers = len(content_layers)
     num_style_layers = len(style_layers)
     style_extractor = vgg_layers(style_layers)
-    style_outputs = style_extractor(style_image * 255)
     extractor = StyleContentModel(style_layers, content_layers)
     results = extractor(tf.constant(content_image))
-    style_results = results["style"]
     style_targets = extractor(style_image)["style"]
     content_targets = extractor(content_image)["content"]
     image = tf.Variable(content_image)

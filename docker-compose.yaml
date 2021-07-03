@@ -1,0 +1,19 @@
+services:
+  gan-style-transfer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - USER=${USER}
+    volumes:
+      - type: bind
+        source: ~./sample_images
+        target: /home/${USER}/photos
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    image: tuttlebr/face-recognition:00-base-${BUILD_VERSION}
