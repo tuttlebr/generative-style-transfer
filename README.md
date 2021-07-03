@@ -5,7 +5,7 @@ A simple implementation of neural style transfer in python using Tensorflow 2.0.
 
 Base Image | Style Image | Final Image
 :-------------------------:|:-------------------------:|:-------------------------:
-<img src="app/sample_images/daphnee_cat.jpg" alt="drawing" width="200"/> | <img src="app/sample_images/the_fall_of_phaeton.jpg" alt="drawing" width="200"/> |  <img src="app/sample_images/generative_style_transfer_result.png" alt="drawing" width="200"/>
+<img src="app/sample_images/daphnee_cat.jpg" alt="drawing" width="200"/> | <img src="app/sample_images/the_fall_of_phaeton.jpg" alt="drawing" width="200"/> |  <img src="app/sample_images/generative_style_transfer_result.jpg" alt="drawing" width="200"/>
 
 ## Build docker Image
 
