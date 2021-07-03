@@ -7,13 +7,7 @@ Base Image | Style Image | Final Image
 :-------------------------:|:-------------------------:|:-------------------------:
 <img src="app/sample_images/daphnee_cat.jpg" alt="drawing" width="200"/> | <img src="app/sample_images/the_fall_of_phaeton.jpg" alt="drawing" width="200"/> |  <img src="app/sample_images/generative_style_transfer_result.jpg" alt="drawing" width="200"/>
 
-## Build docker Image
-
-```bash
-./run.sh
-```
-
-## Customize
+## Customize Style Transfer
 Modifications may be made to the style and content images, as well as hyperparameters, from the .env file.
 
 ```bash
@@ -26,4 +20,10 @@ CONTENT_WEIGHT=10000
 TOTAL_VARIATION_WEIGHT=100000000
 MAX_DIM=512
 USER=brandon
+```
+
+## Run Style Transfer!
+
+```bash
+./run.sh
 ```
