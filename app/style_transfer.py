@@ -1,22 +1,21 @@
 import argparse
-import logging
-import os
-from matplotlib.pyplot import imsave
-import progressbar
-import tensorflow as tf
 from logging import info
+import os
+from tqdm import tqdm
+import tensorflow as tf
+from matplotlib.pyplot import imsave
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
     "-c",
     "--content_path",
-    help="String filename for your original jpeg.",
+    help="String filename for your content image.",
     required=True,
 )
 parser.add_argument(
     "-s",
     "--style_path",
-    help="String filename for your style jpeg.",
+    help="String filename for your style image.",
     required=True,
 )
 parser.add_argument(
@@ -101,8 +100,9 @@ def st_model(
         """Creates a vgg model that returns a list of intermediate output
         values."""
         vgg = tf.keras.applications.VGG19(
-            include_top=False, 
-            weights="vgg19_weights_tf_dim_ordering_tf_kernels_notop.h5")
+            include_top=False,
+            weights="vgg19_weights_tf_dim_ordering_tf_kernels_notop.h5",
+        )
         vgg.trainable = False
 
         outputs = [vgg.get_layer(name).output for name in layer_names]
@@ -134,12 +134,10 @@ def st_model(
         def call(self, inputs):
             "Expects float input in [0,1]"
             inputs = inputs * 255.0
-            preprocessed_input = tf.keras.applications.vgg19.preprocess_input(
-                inputs
-            )
+            preprocessed_input = tf.keras.applications.vgg19.preprocess_input(inputs)
             outputs = self.vgg(preprocessed_input)
             style_outputs, content_outputs = (
-                outputs[:self.num_style_layers],
+                outputs[: self.num_style_layers],
                 outputs[self.num_style_layers :],
             )
 
@@ -149,9 +147,7 @@ def st_model(
 
             content_dict = {
                 content_name: value
-                for content_name, value in zip(
-                    self.content_layers, content_outputs
-                )
+                for content_name, value in zip(self.content_layers, content_outputs)
             }
 
             style_dict = {
@@ -177,9 +173,7 @@ def st_model(
 
         content_loss = tf.add_n(
             [
-                tf.reduce_mean(
-                    (content_outputs[name] - content_targets[name]) ** 2
-                )
+                tf.reduce_mean((content_outputs[name] - content_targets[name]) ** 2)
                 for name in content_outputs.keys()
             ]
         )
@@ -232,26 +226,15 @@ def st_model(
     opt = tf.optimizers.Adam(learning_rate=0.02, beta_1=0.99, epsilon=1e-1)
     image = tf.Variable(content_image)
 
-    step = 0
-    bar = progressbar.ProgressBar(
-        maxval=(epochs * steps_per_epoch),
-        widgets=[
-            "Style Transfer Progress:",
-            progressbar.Bar("=", "[", "]"),
-            " ",
-            progressbar.Percentage(),
-            " ",
-            progressbar.AdaptiveETA(),
-        ],
-    )
+    steps_epochs = (epochs * steps_per_epoch)
 
-    bar.start()
-    for n in range(epochs):
-        for m in range(steps_per_epoch):
-            step += 1
-            train_step(image)
-            bar.update((step - 1) + 1)
-    bar.finish()
+    for m in tqdm(
+        range(0, steps_epochs),
+        desc="Progress: ",
+        total=steps_epochs,
+        ncols = 100,
+        ):
+        train_step(image)
 
     saver(image[0])
 

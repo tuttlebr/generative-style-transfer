@@ -21,7 +21,7 @@ ENV MAX_DIM=${MAX_DIM}
 ENV USER=${USER}
 ENV DEBIAN_FRONTEND=noninteractive
 ENV HOME=/home/${USER}
-ENV TF_CPP_MIN_LOG_LEVEL=1
+
 WORKDIR ${HOME}
 
 RUN useradd -M -s /bin/bash -N -u 1000 ${USER} \
@@ -30,7 +30,7 @@ RUN useradd -M -s /bin/bash -N -u 1000 ${USER} \
 
 COPY vgg19_weights_tf_dim_ordering_tf_kernels_notop.h5 \
     /home/${USER}/vgg19_weights_tf_dim_ordering_tf_kernels_notop.h5
-    
+
 COPY style_transfer.py /home/${USER}/style_transfer.py
 COPY ${CONTENT_PATH} /home/${USER}/content.jpg
 COPY ${STYLE_PATH} /home/${USER}/style.jpg
@@ -44,6 +44,8 @@ RUN pip3 --no-cache-dir install \
 USER ${USER}
 
 RUN mkdir results
+
+ENV TF_CPP_MIN_LOG_LEVEL=1
 
 ENTRYPOINT python3 style_transfer.py \
     -c content.jpg \

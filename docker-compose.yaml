@@ -25,3 +25,4 @@ services:
               count: 1
               capabilities: [gpu]
     image: style-transfer:latest
+    tty: true
