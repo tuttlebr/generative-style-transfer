@@ -1,14 +1,22 @@
 services:
-  gan-style-transfer:
+  generative-style-transfer:
     build:
-      context: .
+      context: app
       dockerfile: Dockerfile
       args:
+        - CONTENT_PATH=${CONTENT_PATH}
+        - STYLE_PATH=${STYLE_PATH}
+        - EPOCHS=${EPOCHS}
+        - STEPS_PER_EPOCH=${STEPS_PER_EPOCH}
+        - STYLE_WEIGHT=${STYLE_WEIGHT}
+        - CONTENT_WEIGHT=${CONTENT_WEIGHT}
+        - TOTAL_VARIATION_WEIGHT=${TOTAL_VARIATION_WEIGHT}
+        - MAX_DIM=${MAX_DIM}
         - USER=${USER}
     volumes:
       - type: bind
-        source: ~./sample_images
-        target: /home/${USER}/photos
+        source: .
+        target: /home/${USER}/results/
     deploy:
       resources:
         reservations:
@@ -16,4 +24,4 @@ services:
             - driver: nvidia
               count: 1
               capabilities: [gpu]
-    image: tuttlebr/face-recognition:00-base-${BUILD_VERSION}
+    image: style-transfer:latest
