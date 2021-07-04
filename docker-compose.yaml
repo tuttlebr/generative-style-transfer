@@ -4,8 +4,6 @@ services:
       context: app
       dockerfile: Dockerfile
       args:
-        - CONTENT_PATH=${CONTENT_PATH}
-        - STYLE_PATH=${STYLE_PATH}
         - EPOCHS=${EPOCHS}
         - STEPS_PER_EPOCH=${STEPS_PER_EPOCH}
         - STYLE_WEIGHT=${STYLE_WEIGHT}
@@ -17,6 +15,12 @@ services:
       - type: bind
         source: .
         target: /home/${USER}/results/
+      - type: bind
+        source: ${CONTENT_PATH}
+        target: /home/${USER}/content.jpg
+      - type: bind
+        source: ${STYLE_PATH}
+        target: /home/${USER}/style.jpg
     deploy:
       resources:
         reservations:

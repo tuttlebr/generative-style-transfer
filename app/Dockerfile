@@ -1,7 +1,5 @@
-FROM nvcr.io/nvidia/tensorflow:20.08-tf2-py3
+FROM tensorflow/tensorflow:2.2.3-gpu-py3@sha256:0cf791ccf53a81debc86360bc7918f711f47b40cf0f451a748b256a47c4e1cf6
 
-ARG CONTENT_PATH=sample_images/daphnee_cat.jpg
-ARG STYLE_PATH=sample_images/sample_images/the_fall_of_phaeton.jpg
 ARG EPOCHS=3
 ARG STEPS_PER_EPOCH=200
 ARG STYLE_WEIGHT=.002
@@ -10,8 +8,6 @@ ARG TOTAL_VARIATION_WEIGHT=100000000
 ARG MAX_DIM=512
 ARG USER=brandon
 
-ENV CONTENT_PATH=${CONTENT_PATH}
-ENV STYLE_PATH=${STYLE_PATH}
 ENV EPOCHS=${EPOCHS}
 ENV STEPS_PER_EPOCH=${STEPS_PER_EPOCH}
 ENV STYLE_WEIGHT=${STYLE_WEIGHT}
@@ -31,15 +27,12 @@ RUN useradd -M -s /bin/bash -N -u 1000 ${USER} \
 COPY vgg19_weights_tf_dim_ordering_tf_kernels_notop.h5 \
     /home/${USER}/vgg19_weights_tf_dim_ordering_tf_kernels_notop.h5
 
-COPY style_transfer.py /home/${USER}/style_transfer.py
-COPY ${CONTENT_PATH} /home/${USER}/content.jpg
-COPY ${STYLE_PATH} /home/${USER}/style.jpg
-
+COPY style_transfer.py style_transfer.py
 
 RUN pip3 --no-cache-dir install \
-    pillow \
-    matplotlib \
-    progressbar
+    pillow~=8.3.0 \
+    matplotlib~=3.3.0 \
+    tqdm~=4.61.0
 
 USER ${USER}
 
