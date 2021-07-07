@@ -11,14 +11,16 @@ Content Image | Style Image | Final Image
 Modifications may be made to the style and content images, as well as hyperparameters, from the .env file.
 
 ```bash
-CONTENT_PATH=sample_images/daphnee_cat.jpg
-STYLE_PATH=sample_images/the_fall_of_phaeton.jpg
-EPOCHS=3
-STEPS_PER_EPOCH=200
-STYLE_WEIGHT=.002
-CONTENT_WEIGHT=10000
-TOTAL_VARIATION_WEIGHT=100000000
-MAX_DIM=512
+CONTENT_PATH=/home/brandon/generative-style-transfer/app/sample_images/daphnee_cat.jpg
+STYLE_PATH=/home/brandon/generative-style-transfer/app/sample_images/the_fall_of_phaeton.jpg
+MODEL_PATH=/home/brandon/generative-style-transfer/app/vgg16_weights_tf_dim_ordering_tf_kernels_notop.h5
+HUB_MODULE=/home/brandon/generative-style-transfer/app/tf_hub_module
+EPOCHS=10
+STEPS_PER_EPOCH=100
+STYLE_WEIGHT=1e-3
+CONTENT_WEIGHT=1e4
+TOTAL_VARIATION_WEIGHT=1e4
+MAX_DIM=2056
 USER=brandon
 ```
 
