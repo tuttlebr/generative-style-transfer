@@ -21,6 +21,14 @@ services:
       - type: bind
         source: ${STYLE_PATH}
         target: /home/${USER}/style.jpg
+      - type: bind
+        source: ${MODEL_PATH}
+        target: /home/${USER}/model_top.h5
+      - type: bind
+        source: ${HUB_MODULE}
+        target: /home/${USER}/tf_hub_module
+    ports:
+      - "8888:8000"
     deploy:
       resources:
         reservations:

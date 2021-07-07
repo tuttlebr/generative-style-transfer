@@ -1,4 +1,4 @@
-FROM tensorflow/tensorflow:2.2.3-gpu-py3@sha256:0cf791ccf53a81debc86360bc7918f711f47b40cf0f451a748b256a47c4e1cf6
+FROM tensorflow/tensorflow:2.3.3-gpu@sha256:62c0c4bac0f762e1f0c4ac537374a409a6aefa2236a4ef790c7dced411c67df0
 
 ARG EPOCHS=3
 ARG STEPS_PER_EPOCH=200
@@ -24,21 +24,25 @@ RUN useradd -M -s /bin/bash -N -u 1000 ${USER} \
     && chown -R ${USER}:users /usr/local/bin \
     && chown -R ${USER}:users ${HOME}
 
-COPY vgg19_weights_tf_dim_ordering_tf_kernels_notop.h5 \
-    /home/${USER}/vgg19_weights_tf_dim_ordering_tf_kernels_notop.h5
-
 COPY style_transfer.py style_transfer.py
-
-RUN pip3 --no-cache-dir install \
-    pillow~=8.3.0 \
-    matplotlib~=3.3.0 \
-    tqdm~=4.61.0
 
 USER ${USER}
 
+RUN pip3 --no-cache-dir install --user\
+    pillow~=8.3.0 \
+    matplotlib~=3.3.0 \
+    tqdm~=4.61.0 \
+    tensorflow-hub~=0.12.0 \
+    tensorflow-addons
+
 RUN mkdir results
 
-ENV TF_CPP_MIN_LOG_LEVEL=1
+EXPOSE 8000
+
+ENV TF_CPP_MIN_LOG_LEVEL=3
+ENV TF_XLA_FLAGS="--tf_xla_auto_jit=2"
+ENV TF_ENABLE_AUTO_MIXED_PRECISION=1
+ENV TFHUB_CACHE_DIR=results
 
 ENTRYPOINT python3 style_transfer.py \
     -c content.jpg \

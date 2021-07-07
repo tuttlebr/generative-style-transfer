@@ -1,10 +1,11 @@
 import argparse
 import os
-from logging import info
-
 import tensorflow as tf
-from matplotlib.pyplot import imsave
+import tensorflow_hub as hub
+import tensorflow_addons as tfa
+from matplotlib.pyplot import imsave, imread
 from tqdm import tqdm
+import numpy as np
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
@@ -87,29 +88,44 @@ def st_model(
 
         new_shape = tf.cast(shape * scale, tf.int32)
 
-        img = tf.image.resize(img, new_shape)
+        img = tf.image.resize(
+            img,
+            new_shape,
+            method="lanczos5",
+            preserve_aspect_ratio=True,
+        )
         img = img[tf.newaxis, :]
         return img
 
     def saver(tensorarray):
         save_as = tensorarray.numpy()
-        file_name = "results/" + str(int(tf.timestamp().numpy())) + ".jpg"
+        file_name = (
+            "results/" + "style_transfer_" + str(int(tf.timestamp().numpy())) + ".jpg"
+        )
         imsave(file_name, save_as)
-        info("Saved style transfer image to: {}".format(file_name))
+        print("Saved style transfer image to: {}".format(file_name))
 
     def vgg_layers(layer_names):
         """Creates a vgg model that returns a list of intermediate output
         values."""
-        vgg = tf.keras.applications.VGG19(
-            include_top=False,
-            weights="vgg19_weights_tf_dim_ordering_tf_kernels_notop.h5",
-        )
+        try:
+            vgg = tf.keras.applications.VGG19(
+                include_top=False,
+                weights="model_top.h5",
+            )
+            vgg_type=19
+        except:
+            vgg = tf.keras.applications.VGG16(
+                include_top=False,
+                weights="model_top.h5",
+            )
+            vgg_type=16
         vgg.trainable = False
 
         outputs = [vgg.get_layer(name).output for name in layer_names]
 
         model = tf.keras.Model([vgg.input], outputs)
-        return model
+        return model, vgg_type
 
     def gram_matrix(input_tensor):
         """the style of an image can be described by the means and correlations
@@ -123,10 +139,18 @@ def st_model(
         num_locations = tf.cast(input_shape[1] * input_shape[2], tf.float32)
         return result / (num_locations)
 
+    def tf_hub_arbitrary_style_transfer(content_image, style_image):
+
+        hub_module = hub.load("tf_hub_module")
+
+        outputs = hub_module(tf.constant(content_image), tf.constant(style_image))
+        stylized_image = outputs[0]
+        saver(tf.squeeze(stylized_image))
+
     class StyleContentModel(tf.keras.models.Model):
         def __init__(self, style_layers, content_layers):
             super(StyleContentModel, self).__init__()
-            self.vgg = vgg_layers(style_layers + content_layers)
+            self.vgg, self.vgg_type = vgg_layers(style_layers + content_layers)
             self.style_layers = style_layers
             self.content_layers = content_layers
             self.num_style_layers = len(style_layers)
@@ -135,9 +159,10 @@ def st_model(
         def call(self, inputs):
             "Expects float input in [0,1]"
             inputs = inputs * 255.0
-            preprocessed_input = tf.keras.applications.vgg19.preprocess_input(
-                inputs
-            )
+            if self.vgg_type == 19:
+                preprocessed_input = tf.keras.applications.vgg19.preprocess_input(inputs)
+            else:
+                preprocessed_input = tf.keras.applications.vgg16.preprocess_input(inputs)
             outputs = self.vgg(preprocessed_input)
             style_outputs, content_outputs = (
                 outputs[: self.num_style_layers],
@@ -150,9 +175,7 @@ def st_model(
 
             content_dict = {
                 content_name: value
-                for content_name, value in zip(
-                    self.content_layers, content_outputs
-                )
+                for content_name, value in zip(self.content_layers, content_outputs)
             }
 
             style_dict = {
@@ -178,9 +201,7 @@ def st_model(
 
         content_loss = tf.add_n(
             [
-                tf.reduce_mean(
-                    (content_outputs[name] - content_targets[name]) ** 2
-                )
+                tf.reduce_mean((content_outputs[name] - content_targets[name]) ** 2)
                 for name in content_outputs.keys()
             ]
         )
@@ -212,6 +233,9 @@ def st_model(
     content_image = load_img(content_path)
     style_image = load_img(style_path)
 
+    # This is crap, but may use fewer resources...
+    # tf_hub_arbitrary_style_transfer(content_image, style_image)
+
     # Content layer with decent results.
     content_layers = ["block5_conv2"]
 
@@ -230,7 +254,7 @@ def st_model(
     style_targets = extractor(style_image)["style"]
     content_targets = extractor(content_image)["content"]
     image = tf.Variable(content_image)
-    opt = tf.optimizers.Adam(learning_rate=0.02, beta_1=0.99, epsilon=1e-1)
+    opt = tfa.optimizers.LazyAdam(learning_rate=0.02)
     image = tf.Variable(content_image)
 
     steps_epochs = epochs * steps_per_epoch
@@ -239,7 +263,6 @@ def st_model(
         range(0, steps_epochs),
         desc="Progress: ",
         total=steps_epochs,
-        ncols=100,
     ):
         train_step(image)
 
