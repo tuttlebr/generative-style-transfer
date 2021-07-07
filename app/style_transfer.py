@@ -1,11 +1,12 @@
 import argparse
 import os
-import tensorflow as tf
-import tensorflow_hub as hub
-import tensorflow_addons as tfa
-from matplotlib.pyplot import imsave, imread
-from tqdm import tqdm
+
 import numpy as np
+import tensorflow as tf
+import tensorflow_addons as tfa
+import tensorflow_hub as hub
+from matplotlib.pyplot import imread, imsave
+from tqdm import tqdm
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
@@ -100,7 +101,10 @@ def st_model(
     def saver(tensorarray):
         save_as = tensorarray.numpy()
         file_name = (
-            "results/" + "style_transfer_" + str(int(tf.timestamp().numpy())) + ".jpg"
+            "results/"
+            + "style_transfer_"
+            + str(int(tf.timestamp().numpy()))
+            + ".jpg"
         )
         imsave(file_name, save_as)
         print("Saved style transfer image to: {}".format(file_name))
@@ -113,13 +117,13 @@ def st_model(
                 include_top=False,
                 weights="model_top.h5",
             )
-            vgg_type=19
+            vgg_type = 19
         except:
             vgg = tf.keras.applications.VGG16(
                 include_top=False,
                 weights="model_top.h5",
             )
-            vgg_type=16
+            vgg_type = 16
         vgg.trainable = False
 
         outputs = [vgg.get_layer(name).output for name in layer_names]
@@ -143,7 +147,9 @@ def st_model(
 
         hub_module = hub.load("tf_hub_module")
 
-        outputs = hub_module(tf.constant(content_image), tf.constant(style_image))
+        outputs = hub_module(
+            tf.constant(content_image), tf.constant(style_image)
+        )
         stylized_image = outputs[0]
         saver(tf.squeeze(stylized_image))
 
@@ -160,9 +166,13 @@ def st_model(
             "Expects float input in [0,1]"
             inputs = inputs * 255.0
             if self.vgg_type == 19:
-                preprocessed_input = tf.keras.applications.vgg19.preprocess_input(inputs)
+                preprocessed_input = (
+                    tf.keras.applications.vgg19.preprocess_input(inputs)
+                )
             else:
-                preprocessed_input = tf.keras.applications.vgg16.preprocess_input(inputs)
+                preprocessed_input = (
+                    tf.keras.applications.vgg16.preprocess_input(inputs)
+                )
             outputs = self.vgg(preprocessed_input)
             style_outputs, content_outputs = (
                 outputs[: self.num_style_layers],
@@ -175,7 +185,9 @@ def st_model(
 
             content_dict = {
                 content_name: value
-                for content_name, value in zip(self.content_layers, content_outputs)
+                for content_name, value in zip(
+                    self.content_layers, content_outputs
+                )
             }
 
             style_dict = {
@@ -201,7 +213,9 @@ def st_model(
 
         content_loss = tf.add_n(
             [
-                tf.reduce_mean((content_outputs[name] - content_targets[name]) ** 2)
+                tf.reduce_mean(
+                    (content_outputs[name] - content_targets[name]) ** 2
+                )
                 for name in content_outputs.keys()
             ]
         )
