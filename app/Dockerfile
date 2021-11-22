@@ -1,21 +1,7 @@
-FROM tensorflow/tensorflow:2.3.3-gpu@sha256:62c0c4bac0f762e1f0c4ac537374a409a6aefa2236a4ef790c7dced411c67df0
+FROM nvcr.io/nvidia/tensorflow:20.10-tf2-py3
 
-ARG EPOCHS=3
-ARG STEPS_PER_EPOCH=200
-ARG STYLE_WEIGHT=.002
-ARG CONTENT_WEIGHT=10000
-ARG TOTAL_VARIATION_WEIGHT=100000000
-ARG MAX_DIM=512
-ARG USER=brandon
+ARG USER=jovyan
 
-ENV EPOCHS=${EPOCHS}
-ENV STEPS_PER_EPOCH=${STEPS_PER_EPOCH}
-ENV STYLE_WEIGHT=${STYLE_WEIGHT}
-ENV CONTENT_WEIGHT=${CONTENT_WEIGHT}
-ENV TOTAL_VARIATION_WEIGHT=${TOTAL_VARIATION_WEIGHT}
-ENV MAX_DIM=${MAX_DIM}
-ENV USER=${USER}
-ENV DEBIAN_FRONTEND=noninteractive
 ENV HOME=/home/${USER}
 
 WORKDIR ${HOME}
@@ -33,7 +19,7 @@ RUN pip3 --no-cache-dir install --user\
     matplotlib~=3.3.0 \
     tqdm~=4.61.0 \
     tensorflow-hub~=0.12.0 \
-    tensorflow-addons
+    tensorflow-addons~=0.13.0
 
 RUN mkdir results
 
