@@ -3,14 +3,14 @@ services:
     build:
       context: app
       dockerfile: Dockerfile
-    environment:
-      - EPOCHS=${EPOCHS}
-      - STEPS_PER_EPOCH=${STEPS_PER_EPOCH}
-      - STYLE_WEIGHT=${STYLE_WEIGHT}
-      - CONTENT_WEIGHT=${CONTENT_WEIGHT}
-      - TOTAL_VARIATION_WEIGHT=${TOTAL_VARIATION_WEIGHT}
-      - MAX_DIM=${MAX_DIM}
-      - USER=${USER}
+      args:
+        - EPOCHS=${EPOCHS}
+        - STEPS_PER_EPOCH=${STEPS_PER_EPOCH}
+        - STYLE_WEIGHT=${STYLE_WEIGHT}
+        - CONTENT_WEIGHT=${CONTENT_WEIGHT}
+        - TOTAL_VARIATION_WEIGHT=${TOTAL_VARIATION_WEIGHT}
+        - MAX_DIM=${MAX_DIM}
+        - USER=${USER}
     volumes:
       - type: bind
         source: .
