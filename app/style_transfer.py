@@ -4,7 +4,6 @@ import os
 import numpy as np
 import tensorflow as tf
 import tensorflow_addons as tfa
-import tensorflow_hub as hub
 from matplotlib.pyplot import imread, imsave
 from tqdm import tqdm
 
@@ -115,13 +114,13 @@ def st_model(
         try:
             vgg = tf.keras.applications.VGG19(
                 include_top=False,
-                weights="model_top.h5",
+                weights="/app/model_top.h5",
             )
             vgg_type = 19
         except:
             vgg = tf.keras.applications.VGG16(
                 include_top=False,
-                weights="model_top.h5",
+                weights="/app/model_top.h5",
             )
             vgg_type = 16
         vgg.trainable = False
@@ -143,15 +142,6 @@ def st_model(
         num_locations = tf.cast(input_shape[1] * input_shape[2], tf.float32)
         return result / (num_locations)
 
-    def tf_hub_arbitrary_style_transfer(content_image, style_image):
-
-        hub_module = hub.load("tf_hub_module")
-
-        outputs = hub_module(
-            tf.constant(content_image), tf.constant(style_image)
-        )
-        stylized_image = outputs[0]
-        saver(tf.squeeze(stylized_image))
 
     class StyleContentModel(tf.keras.models.Model):
         def __init__(self, style_layers, content_layers):
@@ -247,8 +237,6 @@ def st_model(
     content_image = load_img(content_path)
     style_image = load_img(style_path)
 
-    # This is crap, but may use fewer resources...
-    # tf_hub_arbitrary_style_transfer(content_image, style_image)
 
     # Content layer with decent results.
     content_layers = ["block5_conv2"]

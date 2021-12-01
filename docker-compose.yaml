@@ -3,32 +3,33 @@ services:
     build:
       context: app
       dockerfile: Dockerfile
-      args:
-        - EPOCHS=${EPOCHS}
-        - STEPS_PER_EPOCH=${STEPS_PER_EPOCH}
-        - STYLE_WEIGHT=${STYLE_WEIGHT}
-        - CONTENT_WEIGHT=${CONTENT_WEIGHT}
-        - TOTAL_VARIATION_WEIGHT=${TOTAL_VARIATION_WEIGHT}
-        - MAX_DIM=${MAX_DIM}
-        - USER=${USER}
+    entrypoint:
+      [
+        "python3",
+        "style_transfer.py",
+        "-c=content.jpg",
+        "-s=style.jpg",
+        "--epochs=${EPOCHS}",
+        "--steps_per_epoch=${STEPS_PER_EPOCH}",
+        "--style_weight=${STYLE_WEIGHT}",
+        "--content_weight=${CONTENT_WEIGHT}",
+        "--total_variation_weight=${TOTAL_VARIATION_WEIGHT}",
+        "--max_dim=${MAX_DIM}",
+      ]
     volumes:
       - type: bind
         source: .
-        target: /home/${USER}/results/
+        target: /app/results/
       - type: bind
         source: ${CONTENT_PATH}
-        target: /home/${USER}/content.jpg
+        target: /app/content.jpg
       - type: bind
         source: ${STYLE_PATH}
-        target: /home/${USER}/style.jpg
+        target: /app/style.jpg
       - type: bind
         source: ${MODEL_PATH}
-        target: /home/${USER}/model_top.h5
-      - type: bind
-        source: ${HUB_MODULE}
-        target: /home/${USER}/tf_hub_module
-    ports:
-      - "8888:8000"
+        target: /app/model_top.h5
+
     deploy:
       resources:
         reservations:
