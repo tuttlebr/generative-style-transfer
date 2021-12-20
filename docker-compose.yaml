@@ -26,16 +26,6 @@ services:
       - type: bind
         source: ${STYLE_PATH}
         target: /app/style.jpg
-      - type: bind
-        source: ${MODEL_PATH}
-        target: /app/model_top.h5
-
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
     image: style-transfer:latest
+    runtime: nvidia
     tty: true

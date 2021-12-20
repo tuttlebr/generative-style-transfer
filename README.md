@@ -13,8 +13,6 @@ Modifications may be made to the style and content images, as well as hyperparam
 ```text
 CONTENT_PATH=~/generative-style-transfer/app/sample_images/daphnee_cat.jpg
 STYLE_PATH=~/generative-style-transfer/app/sample_images/the_fall_of_phaeton.jpg
-MODEL_PATH=~/generative-style-transfer/app/vgg16_weights_tf_dim_ordering_tf_kernels_notop.h5
-HUB_MODULE=~/generative-style-transfer/app/tf_hub_module
 EPOCHS=10
 STEPS_PER_EPOCH=100
 STYLE_WEIGHT=1e-3
